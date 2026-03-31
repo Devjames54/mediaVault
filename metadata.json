@@ -1,0 +1,5 @@
+{
+  "name": "MediaVault",
+  "description": "A lightweight media app for downloading, viewing images and videos with login and email sign up. Admin can manage media.",
+  "requestFramePermissions": []
+}
