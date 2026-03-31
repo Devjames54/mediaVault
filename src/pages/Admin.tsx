@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useMedia } from '../context/MediaContext';
-import { Trash2, Plus, Image as ImageIcon, Film, CheckSquare, Square, Tag } from 'lucide-react';
+import { useDeletionRequests } from '../context/DeletionRequestContext';
+import { Trash2, Plus, Image as ImageIcon, Film, CheckSquare, Square, Tag, AlertTriangle, CheckCircle } from 'lucide-react';
 import { MediaType } from '../types';
 import { AdsControl } from '../components/AdsControl';
 import { CATEGORIES } from '../constants';
@@ -10,6 +11,7 @@ import { CATEGORIES } from '../constants';
 export function Admin() {
   const { user } = useAuth();
   const { media, addMedia, deleteMedia, bulkDeleteMedia, bulkUpdateCategory } = useMedia();
+  const { requests, resolveRequest, deleteRequest } = useDeletionRequests();
   const navigate = useNavigate();
 
   const [title, setTitle] = useState('');
@@ -64,6 +66,8 @@ export function Admin() {
     }
   };
 
+  const pendingRequests = requests.filter(r => r.status === 'pending');
+
   // Protect route
   if (!user || user.role !== 'admin') {
     return (
@@ -102,6 +106,67 @@ export function Admin() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-3xl font-bold text-zinc-100 mb-8">Admin Dashboard</h1>
+
+      {pendingRequests.length > 0 && (
+        <div className="mb-8 bg-zinc-900 border border-red-500/20 rounded-2xl p-6">
+          <h2 className="text-xl font-semibold text-zinc-100 mb-4 flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-red-400" />
+            Pending Deletion Requests ({pendingRequests.length})
+          </h2>
+          <div className="space-y-4">
+            {pendingRequests.map(request => {
+              const targetMedia = media.find(m => m.id === request.mediaId);
+              return (
+                <div key={request.id} className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm font-medium text-zinc-300">Target Media:</span>
+                      {targetMedia ? (
+                        <span className="text-sm text-indigo-400 font-medium">{targetMedia.title}</span>
+                      ) : (
+                        <span className="text-sm text-zinc-500 italic">Media already deleted</span>
+                      )}
+                    </div>
+                    <p className="text-zinc-400 text-sm">
+                      <span className="text-zinc-300 font-medium">Reason:</span> {request.reason}
+                    </p>
+                    <p className="text-zinc-600 text-xs mt-2">
+                      Requested on {new Date(request.createdAt).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    {targetMedia && (
+                      <button
+                        onClick={async () => {
+                          if (window.confirm('Are you sure you want to delete this media?')) {
+                            try {
+                              await deleteMedia(targetMedia.id);
+                              resolveRequest(request.id);
+                            } catch (e) {
+                              alert('Failed to delete media');
+                            }
+                          }
+                        }}
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors text-sm font-medium"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete Media
+                      </button>
+                    )}
+                    <button
+                      onClick={() => resolveRequest(request.id)}
+                      className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-zinc-800 text-zinc-300 hover:bg-zinc-700 rounded-lg transition-colors text-sm font-medium"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Add Media Form */}
