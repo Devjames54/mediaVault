@@ -7,6 +7,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { MediaProvider } from './context/MediaContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
@@ -18,11 +19,12 @@ import { Profile } from './pages/Profile';
 
 export default function App() {
   return (
-    <AuthProvider>
-      <MediaProvider>
-        <Router>
-          <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 font-sans selection:bg-indigo-500/30">
-            <Navbar />
+    <ThemeProvider>
+      <AuthProvider>
+        <MediaProvider>
+          <Router>
+            <div className="min-h-screen flex flex-col bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans selection:bg-indigo-500/30 transition-colors duration-200">
+              <Navbar />
             <main className="flex-grow">
               <Routes>
                 <Route path="/" element={<Home />} />
@@ -38,5 +40,6 @@ export default function App() {
         </Router>
       </MediaProvider>
     </AuthProvider>
+  </ThemeProvider>
   );
 }

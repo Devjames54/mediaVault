@@ -2,15 +2,16 @@ import React, { useMemo, useState } from 'react';
 import { useMedia } from '../context/MediaContext';
 import { MediaCard } from '../components/MediaCard';
 import { AdBanner } from '../components/AdBanner';
-import { Film, Calendar } from 'lucide-react';
+import { Film, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const ITEMS_PER_PAGE = 80;
 
 export function Home() {
   const { media, searchQuery, typeFilter, categoryFilter } = useMedia();
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredMedia = useMemo(() => {
-    return media.filter(item => {
+    const filtered = media.filter(item => {
       // Search by title
       if (searchQuery && !item.title.toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;
@@ -30,27 +31,52 @@ export function Home() {
       if (categoryFilter !== 'all' && item.category !== categoryFilter) {
         return false;
       }
-
-      // Filter by date range
-      if (startDate || endDate) {
-        const itemDate = new Date(item.createdAt).getTime();
-        
-        if (startDate) {
-          const start = new Date(startDate).getTime();
-          if (itemDate < start) return false;
-        }
-        
-        if (endDate) {
-          // Set to end of day for the end date
-          const end = new Date(endDate);
-          end.setHours(23, 59, 59, 999);
-          if (itemDate > end.getTime()) return false;
-        }
-      }
       
       return true;
     });
-  }, [media, searchQuery, typeFilter, categoryFilter, startDate, endDate]);
+
+    // Sort by newest first
+    return filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [media, searchQuery, typeFilter, categoryFilter]);
+
+  // Reset to first page when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, typeFilter, categoryFilter]);
+
+  const totalPages = Math.ceil(filteredMedia.length / ITEMS_PER_PAGE);
+  const currentMedia = filteredMedia.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push('...');
+        pages.push(currentPage - 1);
+        pages.push(currentPage);
+        pages.push(currentPage + 1);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    return pages;
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -58,39 +84,6 @@ export function Home() {
         <div>
           <h1 className="text-3xl font-bold text-zinc-100 tracking-tight">Discover Media</h1>
           <p className="text-zinc-400 mt-1">Explore our collection of images and videos.</p>
-        </div>
-        
-        <div className="flex flex-wrap items-center gap-3 bg-zinc-900/50 p-2 rounded-xl border border-zinc-800">
-          <div className="flex items-center gap-2 px-2">
-            <Calendar className="w-4 h-4 text-zinc-400" />
-            <span className="text-sm font-medium text-zinc-300">Date Range</span>
-          </div>
-          <div className="hidden sm:block h-6 w-px bg-zinc-800" />
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <input 
-              type="date" 
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 flex-1 sm:flex-none"
-              title="Start Date"
-            />
-            <span className="text-zinc-500 text-sm">to</span>
-            <input 
-              type="date" 
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 flex-1 sm:flex-none"
-              title="End Date"
-            />
-          </div>
-          {(startDate || endDate) && (
-            <button 
-              onClick={() => { setStartDate(''); setEndDate(''); }}
-              className="text-xs text-zinc-400 hover:text-zinc-200 px-2 w-full sm:w-auto text-right sm:text-left"
-            >
-              Clear
-            </button>
-          )}
         </div>
       </div>
 
@@ -103,11 +96,55 @@ export function Home() {
           <p className="text-zinc-500">Try adjusting your search or filters in the menu.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredMedia.map((item) => (
-            <MediaCard key={item.id} item={item} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {currentMedia.map((item) => (
+              <MediaCard key={item.id} item={item} />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="mt-12 flex items-center justify-center gap-2">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg border border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title="Previous Page"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((page, index) => (
+                  page === '...' ? (
+                    <span key={`ellipsis-${index}`} className="px-3 py-2 text-zinc-500">...</span>
+                  ) : (
+                    <button
+                      key={`page-${page}`}
+                      onClick={() => setCurrentPage(page as number)}
+                      className={`min-w-[40px] h-10 rounded-lg text-sm font-medium transition-colors ${
+                        currentPage === page
+                          ? 'bg-indigo-600 text-white'
+                          : 'border border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                ))}
+              </div>
+
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg border border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title="Next Page"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
