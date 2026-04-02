@@ -95,7 +95,7 @@ export function Footer() {
         
         <div className="border-t border-zinc-900 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-zinc-500 text-sm">
-            © {new Date().getFullYear()} MediaHub. All rights reserved.
+            © {new Date().getFullYear()} BestNigthVideos&Pics. All rights reserved.
           </p>
           <div className="flex gap-4 text-sm text-zinc-500">
             <Link to="/terms" className="hover:text-zinc-300 transition-colors">Terms</Link>

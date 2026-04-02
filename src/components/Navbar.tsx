@@ -43,7 +43,7 @@ export function Navbar() {
           <div className="flex justify-between h-16 items-center gap-4">
             <Link to="/" className="flex items-center gap-2 text-xl font-bold tracking-tight hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors flex-shrink-0">
               <PlaySquare className="w-6 h-6 text-indigo-600 dark:text-indigo-500" />
-              <span className="hidden sm:block">MediaVault</span>
+              <span className="hidden sm:block">BestNigthVideos&Pics</span>
             </Link>
             
             <div className="flex-1 max-w-2xl px-2">

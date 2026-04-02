@@ -9,7 +9,7 @@ export function Terms() {
         
         <h2 className="text-xl font-semibold text-zinc-200 mt-8 mb-4">1. Acceptance of Terms</h2>
         <p className="text-zinc-400 mb-6">
-          By accessing and using MediaVault, you accept and agree to be bound by the terms and provision of this agreement.
+          By accessing and using BestNigthVideos&Pics, you accept and agree to be bound by the terms and provision of this agreement.
         </p>
 
         <h2 className="text-xl font-semibold text-zinc-200 mt-8 mb-4">2. User Conduct</h2>
@@ -19,7 +19,7 @@ export function Terms() {
 
         <h2 className="text-xl font-semibold text-zinc-200 mt-8 mb-4">3. Content Ownership</h2>
         <p className="text-zinc-400 mb-6">
-          Users retain all ownership rights to the content they upload. By uploading content, you grant MediaVault a worldwide, non-exclusive, royalty-free license to use, reproduce, and distribute that content in connection with the service.
+          Users retain all ownership rights to the content they upload. By uploading content, you grant BestNigthVideos&Pics a worldwide, non-exclusive, royalty-free license to use, reproduce, and distribute that content in connection with the service.
         </p>
 
         <h2 className="text-xl font-semibold text-zinc-200 mt-8 mb-4">4. Termination</h2>
