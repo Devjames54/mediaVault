@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useModal } from '../context/ModalContext';
 import { User as UserIcon, Save, Mail, Shield } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export function Profile() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { showAlert } = useModal();
   
   const [displayName, setDisplayName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
     if (!user) {
@@ -20,9 +21,21 @@ export function Profile() {
     
     // Fetch current profile data
     const fetchProfile = async () => {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser?.user_metadata?.display_name) {
-        setDisplayName(authUser.user_metadata.display_name);
+      try {
+        const { data: { user: authUser }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error('Error fetching user:', error);
+          if (error.message.includes('Refresh Token Not Found') || error.message.includes('Invalid Refresh Token')) {
+            await supabase.auth.signOut();
+            navigate('/login');
+          }
+          return;
+        }
+        if (authUser?.user_metadata?.display_name) {
+          setDisplayName(authUser.user_metadata.display_name);
+        }
+      } catch (err) {
+        console.error('Unexpected error fetching profile:', err);
       }
     };
     
@@ -34,7 +47,6 @@ export function Profile() {
     if (!user) return;
     
     setIsSaving(true);
-    setMessage({ type: '', text: '' });
     
     try {
       const { error } = await supabase.auth.updateUser({
@@ -43,10 +55,10 @@ export function Profile() {
         
       if (error) throw error;
       
-      setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      showAlert({ type: 'success', message: 'Profile updated successfully!' });
     } catch (error) {
       console.error('Error updating profile:', error);
-      setMessage({ type: 'error', text: 'Failed to update profile. Please try again.' });
+      showAlert({ type: 'error', message: 'Failed to update profile. Please try again.' });
     } finally {
       setIsSaving(false);
     }
@@ -68,16 +80,6 @@ export function Profile() {
         </div>
         
         <div className="p-8">
-          {message.text && (
-            <div className={`mb-6 p-4 rounded-xl text-sm font-medium ${
-              message.type === 'success' 
-                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-                : 'bg-red-500/10 text-red-400 border border-red-500/20'
-            }`}>
-              {message.text}
-            </div>
-          )}
-
           <form onSubmit={handleSave} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-2">

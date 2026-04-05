@@ -3,16 +3,18 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useMedia } from '../context/MediaContext';
 import { useTheme } from '../context/ThemeContext';
+import { useSettings } from '../context/SettingsContext';
 import { PlaySquare, LogOut, User as UserIcon, Shield, Menu, X, Search, Moon, Sun } from 'lucide-react';
-import { CATEGORIES } from '../constants';
 
 export function Navbar() {
   const { user, logout } = useAuth();
   const { searchQuery, setSearchQuery, typeFilter, setTypeFilter, categoryFilter, setCategoryFilter } = useMedia();
   const { theme, toggleTheme } = useTheme();
+  const { settings } = useSettings();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -40,33 +42,62 @@ export function Navbar() {
     <>
       <nav className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 sticky top-0 z-50 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center gap-4">
-            <Link to="/" className="flex items-center gap-2 text-xl font-bold tracking-tight hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors flex-shrink-0">
-              <PlaySquare className="w-6 h-6 text-indigo-600 dark:text-indigo-500" />
-              <span className="hidden sm:block">BestNigthVideos&Pics</span>
-            </Link>
+          <div className="flex justify-between h-16 items-center gap-2 sm:gap-4">
+            {!isSearchOpen && (
+              <Link to="/" className="flex items-center gap-2 text-lg sm:text-xl font-bold tracking-tight hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors flex-shrink min-w-0">
+                {settings.logo_url ? (
+                  <img src={settings.logo_url} alt="Logo" className="h-8 w-auto rounded object-contain flex-shrink-0" />
+                ) : (
+                  <PlaySquare className="w-6 h-6 text-indigo-600 dark:text-indigo-500 flex-shrink-0" />
+                )}
+                <span className="truncate">{settings.site_name}</span>
+              </Link>
+            )}
             
-            <div className="flex-1 max-w-2xl px-2">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
+            <div className={`flex-1 flex justify-end ${isSearchOpen ? 'w-full' : ''}`}>
+              {isSearchOpen ? (
+                <div className="relative w-full max-w-2xl flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-200">
+                  <div className="relative flex-1">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Search className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
+                    </div>
+                    <input
+                      type="text"
+                      autoFocus
+                      placeholder="Search media..."
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      className="w-full bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-9 pr-4 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                    />
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setIsSearchOpen(false);
+                      setSearchQuery('');
+                    }}
+                    className="p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 </div>
-                <input
-                  type="text"
-                  placeholder="Search media..."
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  className="w-full bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-9 pr-4 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                />
-              </div>
+              ) : (
+                <button 
+                  onClick={() => setIsSearchOpen(true)}
+                  className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex-shrink-0"
+                >
+                  <Search className="w-5 h-5" />
+                </button>
+              )}
             </div>
             
-            <button 
-              onClick={() => setIsMenuOpen(true)}
-              className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex-shrink-0"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
+            {!isSearchOpen && (
+              <button 
+                onClick={() => setIsMenuOpen(true)}
+                className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex-shrink-0"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+            )}
           </div>
         </div>
       </nav>
@@ -204,7 +235,7 @@ export function Navbar() {
                     className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-300 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5"
                   >
                     <option value="all">All Categories</option>
-                    {CATEGORIES.map(cat => (
+                    {settings.categories.map(cat => (
                       <option key={cat} value={cat}>{cat}</option>
                     ))}
                   </select>

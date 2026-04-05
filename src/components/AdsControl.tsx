@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useMedia } from '../context/MediaContext';
+import { useModal } from '../context/ModalContext';
 import { Trash2, Plus, ExternalLink, Edit2, X, Save } from 'lucide-react';
 
 export function AdsControl() {
   const { media, addMedia, deleteMedia, updateMedia } = useMedia();
+  const { showAlert, showConfirm } = useModal();
   
   const [title, setTitle] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -33,9 +35,9 @@ export function AdsControl() {
         setImageUrl('');
         setLinkUrl('');
         setDescription('');
-        alert('Ad added successfully!');
+        showAlert({ type: 'success', message: 'Advertisement added successfully!' });
       } catch (error) {
-        alert('Failed to add ad');
+        showAlert({ type: 'error', message: 'Failed to add advertisement. Please try again.' });
       }
     }
   };
@@ -59,11 +61,11 @@ export function AdsControl() {
         thumbnailUrl: editLinkUrl
       });
       
-      alert('Ad updated successfully!');
+      showAlert({ type: 'success', message: 'Advertisement updated successfully!' });
       setEditingId(null);
     } catch (error) {
       console.error('Error updating ad:', error);
-      alert('Failed to update ad');
+      showAlert({ type: 'error', message: 'Failed to update advertisement. Please try again.' });
     }
   };
 
@@ -204,11 +206,13 @@ export function AdsControl() {
                         </button>
                         <button
                           onClick={async () => {
-                            if (window.confirm('Are you sure you want to delete this ad?')) {
+                            const confirmed = await showConfirm('Are you sure you want to delete this advertisement?');
+                            if (confirmed) {
                               try {
                                 await deleteMedia(ad.id);
+                                showAlert({ type: 'success', message: 'Advertisement deleted successfully.' });
                               } catch (error) {
-                                alert('Failed to delete ad');
+                                showAlert({ type: 'error', message: 'Failed to delete advertisement.' });
                               }
                             }
                           }}

@@ -17,3 +17,16 @@ export interface MediaItem {
   category?: string;
   createdAt: string;
 }
+
+export interface SiteSettings {
+  id: number;
+  site_name: string;
+  site_description: string;
+  logo_url: string;
+  favicon_url: string;
+  categories: string[];
+  contact_email?: string;
+  contact_phone?: string;
+  twitter_url?: string;
+  instagram_url?: string;
+}

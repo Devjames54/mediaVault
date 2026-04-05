@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldAlert, Mail, Info, Link as LinkIcon, Twitter, Facebook, Instagram, AlertTriangle } from 'lucide-react';
+import { ShieldAlert, Mail, Info, Link as LinkIcon, Twitter, Instagram, AlertTriangle } from 'lucide-react';
 import { useDeletionRequests } from '../context/DeletionRequestContext';
+import { useSettings } from '../context/SettingsContext';
 
 export function Footer() {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [reportSubmitted, setReportSubmitted] = useState(false);
   const { addRequest } = useDeletionRequests();
+  const { settings } = useSettings();
 
   const handleReportSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +37,7 @@ export function Footer() {
               About Us
             </h3>
             <p className="text-zinc-400 text-sm leading-relaxed">
-              We provide high-quality media downloads for creators and professionals. Our platform ensures you get the best content quickly and securely.
+              {settings.site_description}
             </p>
           </div>
 
@@ -61,8 +63,8 @@ export function Footer() {
               Contact Us
             </h3>
             <ul className="space-y-2 text-sm">
-              <li className="text-zinc-400">support@example.com</li>
-              <li className="text-zinc-400">+1 (555) 123-4567</li>
+              <li className="text-zinc-400">{settings.contact_email || 'support@example.com'}</li>
+              <li className="text-zinc-400">{settings.contact_phone || '+1 (555) 123-4567'}</li>
               <li className="mt-4">
                 <button 
                   onClick={() => setShowReportModal(true)}
@@ -79,13 +81,10 @@ export function Footer() {
           <div>
             <h3 className="text-zinc-100 font-semibold mb-4">Follow Us</h3>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-indigo-400 hover:border-indigo-500/50 transition-all">
+              <a href={settings.twitter_url || '#'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-indigo-400 hover:border-indigo-500/50 transition-all">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-indigo-400 hover:border-indigo-500/50 transition-all">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-indigo-400 hover:border-indigo-500/50 transition-all">
+              <a href={settings.instagram_url || '#'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-indigo-400 hover:border-indigo-500/50 transition-all">
                 <Instagram className="w-5 h-5" />
               </a>
             </div>
@@ -95,7 +94,7 @@ export function Footer() {
         
         <div className="border-t border-zinc-900 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-zinc-500 text-sm">
-            © {new Date().getFullYear()} BestNigthVideos&Pics. All rights reserved.
+            © {new Date().getFullYear()} {settings.site_name}. All rights reserved.
           </p>
           <div className="flex gap-4 text-sm text-zinc-500">
             <Link to="/terms" className="hover:text-zinc-300 transition-colors">Terms</Link>

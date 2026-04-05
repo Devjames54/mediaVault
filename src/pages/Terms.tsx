@@ -1,6 +1,8 @@
 import React from 'react';
+import { useSettings } from '../context/SettingsContext';
 
 export function Terms() {
+  const { settings } = useSettings();
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold text-zinc-100 mb-8">Terms of Service</h1>
@@ -9,7 +11,7 @@ export function Terms() {
         
         <h2 className="text-xl font-semibold text-zinc-200 mt-8 mb-4">1. Acceptance of Terms</h2>
         <p className="text-zinc-400 mb-6">
-          By accessing and using BestNigthVideos&Pics, you accept and agree to be bound by the terms and provision of this agreement.
+          By accessing and using {settings.site_name}, you accept and agree to be bound by the terms and provision of this agreement.
         </p>
 
         <h2 className="text-xl font-semibold text-zinc-200 mt-8 mb-4">2. User Conduct</h2>
@@ -19,7 +21,7 @@ export function Terms() {
 
         <h2 className="text-xl font-semibold text-zinc-200 mt-8 mb-4">3. Content Ownership</h2>
         <p className="text-zinc-400 mb-6">
-          Users retain all ownership rights to the content they upload. By uploading content, you grant BestNigthVideos&Pics a worldwide, non-exclusive, royalty-free license to use, reproduce, and distribute that content in connection with the service.
+          Users retain all ownership rights to the content they upload. By uploading content, you grant {settings.site_name} a worldwide, non-exclusive, royalty-free license to use, reproduce, and distribute that content in connection with the service.
         </p>
 
         <h2 className="text-xl font-semibold text-zinc-200 mt-8 mb-4">4. Termination</h2>
