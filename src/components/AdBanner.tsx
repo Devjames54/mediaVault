@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMedia } from '../context/MediaContext';
+import { getFixedUrl } from '../lib/supabase';
 
 export function AdBanner() {
   const { media } = useMedia();
@@ -31,7 +32,7 @@ export function AdBanner() {
       <div className="flex flex-col sm:flex-row items-center gap-6">
         <div className="w-full sm:w-48 h-32 sm:h-24 bg-zinc-800 rounded-xl overflow-hidden flex-shrink-0">
           <img 
-            src={currentAd.url} 
+            src={getFixedUrl(currentAd.url)} 
             alt={currentAd.title} 
             className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
             referrerPolicy="no-referrer"

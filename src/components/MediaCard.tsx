@@ -2,9 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { MediaItem } from '../types';
 import { Play, Image as ImageIcon } from 'lucide-react';
+import { getFixedUrl } from '../lib/supabase';
 
 export const MediaCard: React.FC<{ item: MediaItem }> = ({ item }) => {
-  const displayUrl = item.type === 'video' ? (item.thumbnailUrl || 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80') : item.url;
+  const displayUrl = item.type === 'video' ? (item.thumbnailUrl ? getFixedUrl(item.thumbnailUrl) : 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80') : getFixedUrl(item.url);
 
   return (
     <Link to={`/media/${item.id}`} className="group relative block aspect-video rounded-xl overflow-hidden bg-zinc-800 border border-zinc-700/50 hover:border-indigo-500/50 transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10">

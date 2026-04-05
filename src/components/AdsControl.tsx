@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useMedia } from '../context/MediaContext';
 import { useModal } from '../context/ModalContext';
 import { Trash2, Plus, ExternalLink, Edit2, X, Save } from 'lucide-react';
+import { getFixedUrl } from '../lib/supabase';
 
 export function AdsControl() {
   const { media, addMedia, deleteMedia, updateMedia } = useMedia();
@@ -175,7 +176,7 @@ export function AdsControl() {
                       <div className="flex items-center gap-4 min-w-0">
                         <div className="w-24 h-16 rounded-lg overflow-hidden bg-zinc-800 flex-shrink-0">
                           <img 
-                            src={ad.url} 
+                            src={getFixedUrl(ad.url)} 
                             alt={ad.title}
                             className="w-full h-full object-cover"
                             referrerPolicy="no-referrer"

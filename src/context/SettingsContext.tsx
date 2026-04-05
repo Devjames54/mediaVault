@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, getFixedUrl } from '../lib/supabase';
 import { SiteSettings } from '../types';
 
 interface SettingsContextType {
@@ -43,7 +43,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         link.rel = 'icon';
         document.getElementsByTagName('head')[0].appendChild(link);
       }
-      link.href = settings.favicon_url;
+      link.href = getFixedUrl(settings.favicon_url);
     }
   }, [settings.site_name, settings.favicon_url]);
 

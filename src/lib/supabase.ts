@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-let supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://laguhturzseygswyaucx.supabase.co';
+export let supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://laguhturzseygswyaucx.supabase.co';
 if (supabaseUrl.endsWith('.com')) {
   supabaseUrl = supabaseUrl.replace('.com', '.co');
 }
@@ -12,3 +12,11 @@ const isBrowser = typeof window !== 'undefined';
 const proxyUrl = isBrowser ? `${window.location.origin}/supabase-proxy` : supabaseUrl;
 
 export const supabase = createClient(proxyUrl, supabaseAnonKey);
+
+export const getFixedUrl = (url: string | undefined | null) => {
+  if (!url) return '';
+  if (url.includes('/supabase-proxy')) {
+    return url.replace(/^.*\/supabase-proxy/, supabaseUrl);
+  }
+  return url;
+};

@@ -8,7 +8,7 @@ import { useModal } from '../context/ModalContext';
 import { Trash2, Plus, Image as ImageIcon, Film, CheckSquare, Square, Tag, AlertTriangle, CheckCircle, Settings, Upload, X } from 'lucide-react';
 import { MediaType } from '../types';
 import { AdsControl } from '../components/AdsControl';
-import { supabase } from '../lib/supabase';
+import { supabase, getFixedUrl } from '../lib/supabase';
 
 export function Admin() {
   const { user } = useAuth();
@@ -102,7 +102,7 @@ export function Admin() {
     if (uploadError) throw uploadError;
     
     const { data } = supabase.storage.from('media').getPublicUrl(filePath);
-    return data.publicUrl;
+    return getFixedUrl(data.publicUrl);
   };
 
   const handleAddMedia = async (e: React.FormEvent) => {
@@ -359,7 +359,7 @@ create policy "Auth Delete" on storage.objects for delete using ( bucket_id = 'm
                 />
                 {settings.logo_url && !logoFile && (
                   <div className="mt-2 text-sm text-zinc-500 flex items-center gap-2">
-                    Current: <img src={settings.logo_url} alt="Logo" className="h-6 w-auto" />
+                    Current: <img src={getFixedUrl(settings.logo_url)} alt="Logo" className="h-6 w-auto" />
                   </div>
                 )}
               </div>
@@ -373,7 +373,7 @@ create policy "Auth Delete" on storage.objects for delete using ( bucket_id = 'm
                 />
                 {settings.favicon_url && !faviconFile && (
                   <div className="mt-2 text-sm text-zinc-500 flex items-center gap-2">
-                    Current: <img src={settings.favicon_url} alt="Favicon" className="h-6 w-auto" />
+                    Current: <img src={getFixedUrl(settings.favicon_url)} alt="Favicon" className="h-6 w-auto" />
                   </div>
                 )}
               </div>
@@ -707,7 +707,7 @@ create policy "Auth Delete" on storage.objects for delete using ( bucket_id = 'm
                           </button>
                           <div className="w-16 h-16 rounded-lg overflow-hidden bg-zinc-800 flex-shrink-0">
                             <img 
-                              src={item.type === 'video' ? (item.thumbnailUrl || 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=200&q=80') : item.url} 
+                              src={item.type === 'video' ? (item.thumbnailUrl ? getFixedUrl(item.thumbnailUrl) : 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=200&q=80') : getFixedUrl(item.url)} 
                               alt={item.title}
                               className="w-full h-full object-cover"
                               referrerPolicy="no-referrer"

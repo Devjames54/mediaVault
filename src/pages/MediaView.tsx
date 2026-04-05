@@ -6,6 +6,7 @@ import { useDeletionRequests } from '../context/DeletionRequestContext';
 import { Download, ArrowLeft, Lock, Play, Pause, Volume2, VolumeX, Maximize, Minimize, AlertTriangle } from 'lucide-react';
 import { MediaCard } from '../components/MediaCard';
 import { AdBanner } from '../components/AdBanner';
+import { getFixedUrl } from '../lib/supabase';
 
 export function MediaView() {
   const { id } = useParams<{ id: string }>();
@@ -158,7 +159,8 @@ export function MediaView() {
     if (!user) return;
     setIsDownloading(true);
     try {
-      const response = await fetch(item.url);
+      const fixedUrl = getFixedUrl(item.url);
+      const response = await fetch(fixedUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -170,7 +172,7 @@ export function MediaView() {
       document.body.removeChild(a);
     } catch (error) {
       console.error('Download failed', error);
-      window.open(item.url, '_blank');
+      window.open(getFixedUrl(item.url), '_blank');
     } finally {
       setIsDownloading(false);
       setShowDownloadConfirm(false);
@@ -209,10 +211,10 @@ export function MediaView() {
             <>
               <video 
                 ref={videoRef}
-                src={item.url} 
+                src={getFixedUrl(item.url)} 
                 autoPlay
                 className="w-full h-full object-contain cursor-pointer"
-                poster={item.thumbnailUrl}
+                poster={item.thumbnailUrl ? getFixedUrl(item.thumbnailUrl) : undefined}
                 onClick={togglePlay}
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleLoadedMetadata}
@@ -271,7 +273,7 @@ export function MediaView() {
             </>
           ) : (
             <img 
-              src={item.url} 
+              src={getFixedUrl(item.url)} 
               alt={item.title} 
               className="w-full h-full object-contain"
               referrerPolicy="no-referrer"

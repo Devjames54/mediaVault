@@ -5,6 +5,7 @@ import { useMedia } from '../context/MediaContext';
 import { useTheme } from '../context/ThemeContext';
 import { useSettings } from '../context/SettingsContext';
 import { PlaySquare, LogOut, User as UserIcon, Shield, Menu, X, Search, Moon, Sun } from 'lucide-react';
+import { getFixedUrl } from '../lib/supabase';
 
 export function Navbar() {
   const { user, logout } = useAuth();
@@ -46,7 +47,7 @@ export function Navbar() {
             {!isSearchOpen && (
               <Link to="/" className="flex items-center gap-2 text-lg sm:text-xl font-bold tracking-tight hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors flex-shrink min-w-0">
                 {settings.logo_url ? (
-                  <img src={settings.logo_url} alt="Logo" className="h-8 w-auto rounded object-contain flex-shrink-0" />
+                  <img src={getFixedUrl(settings.logo_url)} alt="Logo" className="h-8 w-auto rounded object-contain flex-shrink-0" />
                 ) : (
                   <PlaySquare className="w-6 h-6 text-indigo-600 dark:text-indigo-500 flex-shrink-0" />
                 )}
