@@ -202,6 +202,8 @@ export function MediaView() {
         Back
       </button>
 
+      <AdBanner startIndex={0} />
+
       <div className="bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl">
         <div 
           ref={containerRef}
@@ -280,8 +282,11 @@ export function MediaView() {
             />
           )}
         </div>
+      </div>
+
+      <AdBanner startIndex={3} />
         
-        <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+      <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-2xl font-bold text-zinc-100">{item.title}</h1>
@@ -331,7 +336,7 @@ export function MediaView() {
         </div>
       </div>
 
-      <AdBanner />
+      <AdBanner startIndex={6} />
 
       {relatedMedia.length > 0 && (
         <div className="mt-8">
@@ -343,6 +348,8 @@ export function MediaView() {
           </div>
         </div>
       )}
+
+      <AdBanner startIndex={9} />
 
       {/* Download Confirmation Modal */}
       {showDownloadConfirm && (
