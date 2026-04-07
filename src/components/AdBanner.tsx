@@ -52,17 +52,11 @@ export function AdBanner({ startIndex = 0, count = 3 }: AdBannerProps) {
             </div>
           );
 
-          // Use Smartlink URL for some ads (every 3rd ad)
-          const adIndex = ads.indexOf(ad);
-          const targetUrl = (adIndex % 3 === 0) 
-            ? 'https://www.profitablecpmratenetwork.com/zzqnuqr0d?key=97697b435eb12cc8d8f2c31dfb0ce9ac'
-            : ad.thumbnailUrl;
-
-          if (targetUrl) {
+          if (ad.thumbnailUrl) {
             return (
               <a
                 key={ad.id}
-                href={targetUrl}
+                href={ad.thumbnailUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block h-full"
