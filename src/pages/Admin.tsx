@@ -39,6 +39,8 @@ export function Admin() {
   const [siteDesc, setSiteDesc] = useState(settings.site_description);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [faviconFile, setFaviconFile] = useState<File | null>(null);
+  const [logoUrlInput, setLogoUrlInput] = useState('');
+  const [faviconUrlInput, setFaviconUrlInput] = useState('');
   const [categories, setCategories] = useState<string[]>(settings.categories);
   const [newCategory, setNewCategory] = useState('');
   const [contactEmail, setContactEmail] = useState(settings.contact_email || '');
@@ -172,8 +174,8 @@ export function Admin() {
     e.preventDefault();
     setIsSavingSettings(true);
     try {
-      let logo_url = settings.logo_url;
-      let favicon_url = settings.favicon_url;
+      let logo_url = logoUrlInput || settings.logo_url;
+      let favicon_url = faviconUrlInput || settings.favicon_url;
 
       if (logoFile) {
         logo_url = await uploadToSupabase(logoFile, 'site');
@@ -196,6 +198,8 @@ export function Admin() {
       
       setLogoFile(null);
       setFaviconFile(null);
+      setLogoUrlInput('');
+      setFaviconUrlInput('');
       showAlert({ type: 'success', message: 'Settings saved successfully!' });
     } catch (error: any) {
       console.error(error);
@@ -360,13 +364,33 @@ create policy "Auth Delete" on storage.objects for delete using ( bucket_id = 'm
               </div>
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-1.5">Site Logo</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-zinc-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500"
-                />
-                {settings.logo_url && !logoFile && (
+                <div className="space-y-3">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      setLogoFile(e.target.files?.[0] || null);
+                      setLogoUrlInput('');
+                    }}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-zinc-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500"
+                  />
+                  <div className="flex items-center gap-2 text-zinc-500 text-sm">
+                    <span className="flex-1 h-px bg-zinc-800"></span>
+                    OR PASTE URL
+                    <span className="flex-1 h-px bg-zinc-800"></span>
+                  </div>
+                  <input
+                    type="url"
+                    value={logoUrlInput}
+                    onChange={(e) => {
+                      setLogoUrlInput(e.target.value);
+                      setLogoFile(null);
+                    }}
+                    placeholder="https://example.com/logo.png"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                {settings.logo_url && !logoFile && !logoUrlInput && (
                   <div className="mt-2 text-sm text-zinc-500 flex items-center gap-2">
                     Current: <img src={getFixedUrl(settings.logo_url)} alt="Logo" className="h-6 w-auto" />
                   </div>
@@ -374,13 +398,33 @@ create policy "Auth Delete" on storage.objects for delete using ( bucket_id = 'm
               </div>
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-1.5">Site Favicon</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setFaviconFile(e.target.files?.[0] || null)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-zinc-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500"
-                />
-                {settings.favicon_url && !faviconFile && (
+                <div className="space-y-3">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      setFaviconFile(e.target.files?.[0] || null);
+                      setFaviconUrlInput('');
+                    }}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-zinc-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500"
+                  />
+                  <div className="flex items-center gap-2 text-zinc-500 text-sm">
+                    <span className="flex-1 h-px bg-zinc-800"></span>
+                    OR PASTE URL
+                    <span className="flex-1 h-px bg-zinc-800"></span>
+                  </div>
+                  <input
+                    type="url"
+                    value={faviconUrlInput}
+                    onChange={(e) => {
+                      setFaviconUrlInput(e.target.value);
+                      setFaviconFile(null);
+                    }}
+                    placeholder="https://example.com/favicon.ico"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                {settings.favicon_url && !faviconFile && !faviconUrlInput && (
                   <div className="mt-2 text-sm text-zinc-500 flex items-center gap-2">
                     Current: <img src={getFixedUrl(settings.favicon_url)} alt="Favicon" className="h-6 w-auto" />
                   </div>
