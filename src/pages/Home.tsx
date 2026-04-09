@@ -2,9 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { useMedia } from '../context/MediaContext';
 import { useSettings } from '../context/SettingsContext';
 import { MediaCard } from '../components/MediaCard';
-import { AdBanner } from '../components/AdBanner';
+import { BannerAd, NativeBannerAd } from '../components/Ads';
 import { Film, ChevronLeft, ChevronRight } from 'lucide-react';
-import { MediaItem } from '../types';
 
 const ITEMS_PER_PAGE = 80;
 
@@ -53,19 +52,6 @@ export function Home() {
     currentPage * ITEMS_PER_PAGE
   );
 
-  const mediaSections = useMemo<MediaItem[][]>(() => {
-    if (currentMedia.length === 0) {
-      return [[], [], []];
-    }
-
-    const chunkSize = Math.ceil(currentMedia.length / 3);
-    return [
-      currentMedia.slice(0, chunkSize),
-      currentMedia.slice(chunkSize, chunkSize * 2),
-      currentMedia.slice(chunkSize * 2),
-    ];
-  }, [currentMedia]);
-
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
@@ -103,8 +89,6 @@ export function Home() {
         </div>
       </div>
 
-      <AdBanner startIndex={0} />
-
       {filteredMedia.length === 0 ? (
         <div className="text-center py-20 bg-zinc-900/50 rounded-2xl border border-zinc-800">
           <Film className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
@@ -113,35 +97,33 @@ export function Home() {
         </div>
       ) : (
         <>
-          {mediaSections[0].length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {mediaSections[0].map((item) => (
-                <MediaCard key={item.id} item={item} />
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {currentMedia.map((item, index) => {
+              const elements = [];
+              
+              if (index % 20 === 0) {
+                elements.push(
+                  <div key={`ad-banner-${index}`} className="col-span-full flex flex-col items-center gap-4 my-4">
+                    <BannerAd />
+                    <NativeBannerAd />
+                  </div>
+                );
+              }
+              
+              elements.push(<MediaCard key={item.id} item={item} />);
+              
+              if (index === currentMedia.length - 1 && (index + 1) % 20 === 0) {
+                elements.push(
+                  <div key={`ad-banner-end-${index}`} className="col-span-full flex flex-col items-center gap-4 my-4">
+                    <BannerAd />
+                    <NativeBannerAd />
+                  </div>
+                );
+              }
 
-          <AdBanner startIndex={3} />
-
-          {mediaSections[1].length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {mediaSections[1].map((item) => (
-                <MediaCard key={item.id} item={item} />
-              ))}
-            </div>
-          )}
-
-          <AdBanner startIndex={6} />
-
-          {mediaSections[2].length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {mediaSections[2].map((item) => (
-                <MediaCard key={item.id} item={item} />
-              ))}
-            </div>
-          )}
-
-          <AdBanner startIndex={9} />
+              return elements;
+            })}
+          </div>
 
           {totalPages > 1 && (
             <div className="mt-12 flex items-center justify-center gap-2">

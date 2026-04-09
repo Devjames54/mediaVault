@@ -3,9 +3,9 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useMedia } from '../context/MediaContext';
 import { useAuth } from '../context/AuthContext';
 import { useDeletionRequests } from '../context/DeletionRequestContext';
-import { Download, ArrowLeft, Lock, Play, Pause, Volume2, VolumeX, Maximize, Minimize, AlertTriangle } from 'lucide-react';
+import { Download, ArrowLeft, Lock, Play, Pause, Volume2, VolumeX, Maximize, Minimize, AlertTriangle, ExternalLink } from 'lucide-react';
 import { MediaCard } from '../components/MediaCard';
-import { AdBanner } from '../components/AdBanner';
+import { BannerAd, NativeBannerAd } from '../components/Ads';
 import { getFixedUrl } from '../lib/supabase';
 
 export function MediaView() {
@@ -202,8 +202,6 @@ export function MediaView() {
         Back
       </button>
 
-      <AdBanner startIndex={0} />
-
       <div className="bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl">
         <div 
           ref={containerRef}
@@ -282,8 +280,6 @@ export function MediaView() {
             />
           )}
         </div>
-
-        <AdBanner startIndex={3} />
         
         <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
@@ -296,9 +292,6 @@ export function MediaView() {
               )}
             </div>
             <div className="flex items-center gap-4">
-              <p className="text-zinc-500 text-sm">
-                Added on {new Date(item.createdAt).toLocaleDateString()}
-              </p>
               <button 
                 onClick={() => setShowReportModal(true)}
                 className="text-red-400 hover:text-red-300 text-sm flex items-center gap-1 transition-colors"
@@ -309,7 +302,16 @@ export function MediaView() {
             </div>
           </div>
           
-          <div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a 
+              href="https://www.profitablecpmratenetwork.com/a28v6vs8kz?key=3b03c444eff3c42df665f815e2cc24f2"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-3 rounded-xl font-medium transition-all shadow-lg w-full sm:w-auto justify-center"
+            >
+              <ExternalLink className="w-5 h-5" />
+              HD Version
+            </a>
             {user ? (
               <button 
                 onClick={() => setShowDownloadConfirm(true)}
@@ -335,7 +337,10 @@ export function MediaView() {
         </div>
       </div>
 
-      <AdBanner startIndex={6} />
+      <div className="my-8 flex flex-col items-center gap-4">
+        <BannerAd />
+        <NativeBannerAd />
+      </div>
 
       {relatedMedia.length > 0 && (
         <div className="mt-8">
@@ -347,8 +352,6 @@ export function MediaView() {
           </div>
         </div>
       )}
-
-      <AdBanner startIndex={9} />
 
       {/* Download Confirmation Modal */}
       {showDownloadConfirm && (

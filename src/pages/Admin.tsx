@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useMedia } from '../context/MediaContext';
@@ -7,7 +7,6 @@ import { useSettings } from '../context/SettingsContext';
 import { useModal } from '../context/ModalContext';
 import { Trash2, Plus, Image as ImageIcon, Film, CheckSquare, Square, Tag, AlertTriangle, CheckCircle, Settings, Upload, X } from 'lucide-react';
 import { MediaType } from '../types';
-import { AdsControl } from '../components/AdsControl';
 import { supabase, getFixedUrl } from '../lib/supabase';
 
 export function Admin() {
@@ -47,6 +46,16 @@ export function Admin() {
   const [twitterUrl, setTwitterUrl] = useState(settings.twitter_url || '');
   const [instagramUrl, setInstagramUrl] = useState(settings.instagram_url || '');
   const [isSavingSettings, setIsSavingSettings] = useState(false);
+
+  useEffect(() => {
+    setSiteName(settings.site_name);
+    setSiteDesc(settings.site_description);
+    setCategories(settings.categories);
+    setContactEmail(settings.contact_email || '');
+    setContactPhone(settings.contact_phone || '');
+    setTwitterUrl(settings.twitter_url || '');
+    setInstagramUrl(settings.instagram_url || '');
+  }, [settings]);
 
   const toggleSelection = (id: string) => {
     const newSelection = new Set(selectedItems);
@@ -724,9 +733,6 @@ create policy "Auth Delete" on storage.objects for delete using ( bucket_id = 'm
                                   {item.category}
                                 </span>
                               )}
-                              <span className="text-xs text-zinc-500">
-                                {new Date(item.createdAt).toLocaleDateString()}
-                              </span>
                             </div>
                           </div>
                         </div>
@@ -756,8 +762,6 @@ create policy "Auth Delete" on storage.objects for delete using ( bucket_id = 'm
               </div>
             </div>
           </div>
-
-          <AdsControl />
         </>
       )}
     </div>
