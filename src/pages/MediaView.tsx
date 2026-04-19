@@ -222,10 +222,10 @@ export function MediaView() {
               />
               
               {/* Custom Controls Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-300 flex flex-col gap-3">
-                {/* Progress Bar */}
+              <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-300 flex flex-col gap-3">
+                {/* Progress Bar with subtler background */}
                 <div 
-                  className="w-full h-1.5 bg-zinc-600/50 rounded-full cursor-pointer relative hover:h-2 transition-all group/progress"
+                  className="w-full h-1.5 bg-black/40 backdrop-blur-sm rounded-full cursor-pointer relative hover:h-2 transition-all group/progress"
                   onClick={handleSeek}
                 >
                   <div 

@@ -44,39 +44,38 @@ export const MediaCard: React.FC<{ item: MediaItem }> = ({ item }) => {
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="group relative block aspect-video rounded-xl overflow-hidden bg-zinc-800 border border-zinc-700/50 hover:border-indigo-500/50 transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 cursor-pointer"
+      className="group relative block rounded-xl overflow-hidden bg-zinc-800 border border-zinc-700/50 hover:border-indigo-500/50 transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 cursor-pointer"
     >
-      {item.type === 'video' ? (
-        <video 
-          ref={videoRef}
-          src={getFixedUrl(item.url)}
-          poster={item.thumbnailUrl ? getFixedUrl(item.thumbnailUrl) : undefined}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          muted
-          loop
-          playsInline
-          preload="none"
-        />
-      ) : (
-        <img 
-          src={displayUrl} 
-          alt={item.title} 
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          loading="lazy"
-          referrerPolicy="no-referrer"
-        />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="aspect-video relative overflow-hidden bg-black">
+        {item.type === 'video' ? (
+          <video 
+            ref={videoRef}
+            src={getFixedUrl(item.url)}
+            poster={item.thumbnailUrl ? getFixedUrl(item.thumbnailUrl) : undefined}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            muted
+            loop
+            playsInline
+            preload="none"
+          />
+        ) : (
+          <img 
+            src={displayUrl} 
+            alt={item.title} 
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+            referrerPolicy="no-referrer"
+          />
+        )}
+      </div>
       
-      <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
-        <div className="min-w-0 pr-4">
-          <h3 className="text-white font-medium truncate drop-shadow-md">{item.title}</h3>
-          {item.category && (
-            <span className="inline-block mt-1 px-2 py-0.5 bg-zinc-900/60 backdrop-blur-md border border-zinc-700/50 rounded-md text-[10px] font-medium text-zinc-300 uppercase tracking-wider">
-              {item.category}
-            </span>
-          )}
-        </div>
+      <div className="p-4 bg-zinc-950/20">
+        <h3 className="text-white text-sm font-medium truncate group-hover:text-indigo-400 transition-colors">{item.title}</h3>
+        {item.category && (
+          <span className="inline-block mt-1 px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 rounded-md text-[10px] font-medium text-indigo-300 uppercase tracking-wider">
+            {item.category}
+          </span>
+        )}
       </div>
     </a>
   );

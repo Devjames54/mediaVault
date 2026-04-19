@@ -46,7 +46,7 @@ export function Admin() {
   const [contactEmail, setContactEmail] = useState(settings.contact_email || '');
   const [contactPhone, setContactPhone] = useState(settings.contact_phone || '');
   const [twitterUrl, setTwitterUrl] = useState(settings.twitter_url || '');
-  const [instagramUrl, setInstagramUrl] = useState(settings.instagram_url || '');
+  const [telegramUrl, setTelegramUrl] = useState(settings.telegram_url || '');
   const [isSavingSettings, setIsSavingSettings] = useState(false);
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export function Admin() {
     setContactEmail(settings.contact_email || '');
     setContactPhone(settings.contact_phone || '');
     setTwitterUrl(settings.twitter_url || '');
-    setInstagramUrl(settings.instagram_url || '');
+    setTelegramUrl(settings.telegram_url || '');
   }, [settings]);
 
   const toggleSelection = (id: string) => {
@@ -193,7 +193,7 @@ export function Admin() {
         contact_email: contactEmail,
         contact_phone: contactPhone,
         twitter_url: twitterUrl,
-        instagram_url: instagramUrl
+        telegram_url: telegramUrl
       });
       
       setLogoFile(null);
@@ -203,10 +203,15 @@ export function Admin() {
       showAlert({ type: 'success', message: 'Settings saved successfully!' });
     } catch (error: any) {
       console.error(error);
-      let errorMsg = error.message;
-      if (errorMsg.includes('403') || errorMsg.includes('Forbidden') || errorMsg.includes('<html>')) {
+      let errorMsg = error.message || 'Unknown error occurred';
+      
+      // Only show storage error if it was actually a storage operation that failed
+      if ((logoFile || faviconFile) && (errorMsg.includes('403') || errorMsg.includes('Forbidden') || errorMsg.includes('<html>'))) {
         errorMsg = "Storage permission denied. Please ensure your Supabase storage bucket is set to public and you have the correct permissions.";
+      } else if (errorMsg.includes('row-level security') || errorMsg.includes('RLS')) {
+        errorMsg = "Database permission denied. Please run the SQL setup script to configure RLS policies for the settings table.";
       }
+      
       showAlert({ type: 'error', message: `Failed to save settings: ${errorMsg}` });
     } finally {
       setIsSavingSettings(false);
@@ -281,8 +286,15 @@ CREATE TABLE IF NOT EXISTS settings (
   contact_email TEXT,
   contact_phone TEXT,
   twitter_url TEXT,
-  instagram_url TEXT
+  telegram_url TEXT
 );
+
+-- Enable RLS and add policies for settings table
+ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read access on settings" ON settings FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated users to update settings" ON settings FOR UPDATE TO authenticated USING (true);
+CREATE POLICY "Allow authenticated users to insert settings" ON settings FOR INSERT TO authenticated WITH CHECK (true);
+
 INSERT INTO settings (id, site_name, site_description, categories, contact_email, contact_phone) 
 VALUES (1, 'BestNigthVideos&Pics', 'A lightweight media app', '["Nature", "Gaming", "Music"]', 'support@example.com', '+1 (555) 123-4567') 
 ON CONFLICT DO NOTHING;
@@ -353,13 +365,13 @@ create policy "Auth Delete" on storage.objects for delete using ( bucket_id = 'm
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-1.5">Instagram URL</label>
+                <label className="block text-sm font-medium text-zinc-300 mb-1.5">Telegram URL</label>
                 <input
                   type="url"
-                  value={instagramUrl}
-                  onChange={(e) => setInstagramUrl(e.target.value)}
+                  value={telegramUrl}
+                  onChange={(e) => setTelegramUrl(e.target.value)}
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="https://instagram.com/yourhandle"
+                  placeholder="https://t.me/yourchannel"
                 />
               </div>
               <div>

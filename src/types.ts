@@ -28,5 +28,5 @@ export interface SiteSettings {
   contact_email?: string;
   contact_phone?: string;
   twitter_url?: string;
-  instagram_url?: string;
+  telegram_url?: string;
 }

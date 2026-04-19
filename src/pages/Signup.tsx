@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { PlaySquare, Eye, EyeOff } from 'lucide-react';
+import { Film, Eye, EyeOff } from 'lucide-react';
 
 export function Signup() {
   const [email, setEmail] = useState('');
@@ -50,7 +50,7 @@ export function Signup() {
       <div className="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-xl">
         <div className="flex flex-col items-center mb-8">
           <div className="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center mb-4">
-            <PlaySquare className="w-6 h-6 text-indigo-500" />
+            <Film className="w-6 h-6 text-indigo-500" />
           </div>
           <h2 className="text-2xl font-bold text-zinc-100">Create an account</h2>
           <p className="text-zinc-400 text-sm mt-1">Join to download high-quality media</p>

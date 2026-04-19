@@ -19,7 +19,7 @@ const defaultSettings: SiteSettings = {
   contact_email: 'support@example.com',
   contact_phone: '+1 (555) 123-4567',
   twitter_url: '',
-  instagram_url: ''
+  telegram_url: ''
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldAlert, Mail, Info, Link as LinkIcon, Twitter, Instagram, AlertTriangle } from 'lucide-react';
+import { ShieldAlert, Mail, Info, Link as LinkIcon, Twitter, Send, AlertTriangle } from 'lucide-react';
 import { useDeletionRequests } from '../context/DeletionRequestContext';
 import { useSettings } from '../context/SettingsContext';
 
@@ -84,8 +84,8 @@ export function Footer() {
               <a href={settings.twitter_url || '#'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-indigo-400 hover:border-indigo-500/50 transition-all">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href={settings.instagram_url || '#'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-indigo-400 hover:border-indigo-500/50 transition-all">
-                <Instagram className="w-5 h-5" />
+              <a href={settings.telegram_url || '#'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-indigo-400 hover:border-indigo-500/50 transition-all">
+                <Send className="w-5 h-5" />
               </a>
             </div>
           </div>

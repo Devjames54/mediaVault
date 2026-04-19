@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useMedia } from '../context/MediaContext';
 import { useTheme } from '../context/ThemeContext';
 import { useSettings } from '../context/SettingsContext';
-import { PlaySquare, LogOut, User as UserIcon, Shield, Menu, X, Search, Moon, Sun } from 'lucide-react';
+import { Film, LogOut, User as UserIcon, Shield, Menu, X, Search, Moon, Sun } from 'lucide-react';
 import { getFixedUrl } from '../lib/supabase';
 
 export function Navbar() {
@@ -49,7 +49,7 @@ export function Navbar() {
                 {settings.logo_url ? (
                   <img src={getFixedUrl(settings.logo_url)} alt="Logo" className="h-8 w-auto rounded object-contain flex-shrink-0" />
                 ) : (
-                  <PlaySquare className="w-6 h-6 text-indigo-600 dark:text-indigo-500 flex-shrink-0" />
+                  <Film className="w-6 h-6 text-indigo-600 dark:text-indigo-500 flex-shrink-0" />
                 )}
                 <span className="truncate">{settings.site_name}</span>
               </Link>
