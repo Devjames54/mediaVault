@@ -4,6 +4,7 @@ import { useSettings } from '../context/SettingsContext';
 import { MediaCard } from '../components/MediaCard';
 import { BannerAd, NativeBannerAd } from '../components/Ads';
 import { Film, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 const ITEMS_PER_PAGE = 80;
 
@@ -81,8 +82,25 @@ export function Home() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-4">
+    <>
+      <Helmet>
+        <title>{settings.seo_title || settings.site_name}</title>
+        <meta name="description" content={settings.seo_description || settings.site_description} />
+        {settings.seo_keywords && <meta name="keywords" content={settings.seo_keywords} />}
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={settings.seo_title || settings.site_name} />
+        <meta property="og:description" content={settings.seo_description || settings.site_description} />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={settings.seo_title || settings.site_name} />
+        <meta name="twitter:description" content={settings.seo_description || settings.site_description} />
+      </Helmet>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-4">
         <div>
           <h1 className="text-3xl font-bold text-zinc-100 tracking-tight">{settings.site_name}</h1>
           <p className="text-zinc-400 mt-1">{settings.site_description}</p>
@@ -169,5 +187,6 @@ export function Home() {
         </>
       )}
     </div>
+    </>
   );
 }

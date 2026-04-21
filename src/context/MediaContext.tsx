@@ -48,6 +48,9 @@ export function MediaProvider({ children }: { children: React.ReactNode }) {
         url: item.url,
         thumbnailUrl: item.thumbnail_url,
         category: item.category,
+        seoTitle: item.seo_title,
+        seoDescription: item.seo_description,
+        seoKeywords: item.seo_keywords,
         createdAt: item.created_at
       })));
     }
@@ -61,7 +64,10 @@ export function MediaProvider({ children }: { children: React.ReactNode }) {
         type: item.type,
         url: item.url,
         thumbnail_url: item.thumbnailUrl,
-        category: item.category
+        category: item.category,
+        seo_title: item.seoTitle,
+        seo_description: item.seoDescription,
+        seo_keywords: item.seoKeywords
       }])
       .select()
       .single();
@@ -79,6 +85,9 @@ export function MediaProvider({ children }: { children: React.ReactNode }) {
         url: data.url,
         thumbnailUrl: data.thumbnail_url,
         category: data.category,
+        seoTitle: data.seo_title,
+        seoDescription: data.seo_description,
+        seoKeywords: data.seo_keywords,
         createdAt: data.created_at
       };
       setMedia([newItem, ...media]);
@@ -106,7 +115,10 @@ export function MediaProvider({ children }: { children: React.ReactNode }) {
         title: updates.title,
         url: updates.url,
         thumbnail_url: updates.thumbnailUrl,
-        category: updates.category
+        category: updates.category,
+        seo_title: updates.seoTitle,
+        seo_description: updates.seoDescription,
+        seo_keywords: updates.seoKeywords
       })
       .eq('id', id);
 

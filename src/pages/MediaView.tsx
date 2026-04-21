@@ -7,6 +7,7 @@ import { Download, ArrowLeft, Lock, Play, Pause, Volume2, VolumeX, Maximize, Min
 import { MediaCard } from '../components/MediaCard';
 import { BannerAd, NativeBannerAd } from '../components/Ads';
 import { getFixedUrl } from '../lib/supabase';
+import { Helmet } from 'react-helmet-async';
 
 export function MediaView() {
   const { id } = useParams<{ id: string }>();
@@ -192,12 +193,34 @@ export function MediaView() {
     }, 2000);
   };
 
+  const pageTitle = item ? (item.seoTitle || item.title) : 'Media Not Found';
+  const pageDescription = item ? (item.seoDescription || `Watch ${item.title} on our platform.`) : '';
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <button 
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-zinc-400 hover:text-zinc-100 transition-colors mb-6"
-      >
+    <>
+      {item && (
+        <Helmet>
+          <title>{pageTitle}</title>
+          <meta name="description" content={pageDescription} />
+          {item.seoKeywords && <meta name="keywords" content={item.seoKeywords} />}
+          
+          <meta property="og:type" content={item.type === 'video' ? 'video.other' : 'image'} />
+          <meta property="og:title" content={pageTitle} />
+          <meta property="og:description" content={pageDescription} />
+          <meta property="og:image" content={item.thumbnailUrl ? getFixedUrl(item.thumbnailUrl) : getFixedUrl(item.url)} />
+          
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={pageTitle} />
+          <meta name="twitter:description" content={pageDescription} />
+          <meta name="twitter:image" content={item.thumbnailUrl ? getFixedUrl(item.thumbnailUrl) : getFixedUrl(item.url)} />
+        </Helmet>
+      )}
+      
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <button 
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-zinc-400 hover:text-zinc-100 transition-colors mb-6"
+        >
         <ArrowLeft className="w-4 h-4" />
         Back
       </button>
@@ -443,5 +466,6 @@ export function MediaView() {
         </div>
       )}
     </div>
+    </>
   );
 }

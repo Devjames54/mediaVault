@@ -19,7 +19,10 @@ const defaultSettings: SiteSettings = {
   contact_email: 'support@example.com',
   contact_phone: '+1 (555) 123-4567',
   twitter_url: '',
-  telegram_url: ''
+  telegram_url: '',
+  seo_title: 'BestNigthVideos&Pics',
+  seo_description: 'A lightweight media app for downloading, viewing images and videos.',
+  seo_keywords: 'media, videos, pictures, download'
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);

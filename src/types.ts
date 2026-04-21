@@ -15,6 +15,9 @@ export interface MediaItem {
   url: string;
   thumbnailUrl?: string; // Optional, useful for videos
   category?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
   createdAt: string;
 }
 
@@ -29,4 +32,7 @@ export interface SiteSettings {
   contact_phone?: string;
   twitter_url?: string;
   telegram_url?: string;
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
 }

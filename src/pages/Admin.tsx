@@ -5,13 +5,13 @@ import { useMedia } from '../context/MediaContext';
 import { useDeletionRequests } from '../context/DeletionRequestContext';
 import { useSettings } from '../context/SettingsContext';
 import { useModal } from '../context/ModalContext';
-import { Trash2, Plus, Image as ImageIcon, Film, CheckSquare, Square, Tag, AlertTriangle, CheckCircle, Settings, Upload, X } from 'lucide-react';
-import { MediaType } from '../types';
+import { Trash2, Plus, Image as ImageIcon, Film, CheckSquare, Square, Tag, AlertTriangle, CheckCircle, Settings, Upload, X, Edit } from 'lucide-react';
+import { MediaType, MediaItem } from '../types';
 import { supabase, getFixedUrl } from '../lib/supabase';
 
 export function Admin() {
   const { user } = useAuth();
-  const { media, addMedia, deleteMedia, bulkDeleteMedia, bulkUpdateCategory } = useMedia();
+  const { media, addMedia, updateMedia, deleteMedia, bulkDeleteMedia, bulkUpdateCategory } = useMedia();
   const { requests, resolveRequest } = useDeletionRequests();
   const { settings, updateSettings, setupRequired } = useSettings();
   const { showAlert, showConfirm } = useModal();
@@ -28,7 +28,11 @@ export function Admin() {
   const [mediaUrlInput, setMediaUrlInput] = useState('');
   const [thumbnailUrlInput, setThumbnailUrlInput] = useState('');
   const [category, setCategory] = useState('');
+  const [mediaSeoTitle, setMediaSeoTitle] = useState('');
+  const [mediaSeoDesc, setMediaSeoDesc] = useState('');
+  const [mediaSeoKeywords, setMediaSeoKeywords] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [editingMedia, setEditingMedia] = useState<MediaItem | null>(null);
 
   // Bulk Actions State
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
@@ -47,6 +51,9 @@ export function Admin() {
   const [contactPhone, setContactPhone] = useState(settings.contact_phone || '');
   const [twitterUrl, setTwitterUrl] = useState(settings.twitter_url || '');
   const [telegramUrl, setTelegramUrl] = useState(settings.telegram_url || '');
+  const [globalSeoTitle, setGlobalSeoTitle] = useState(settings.seo_title || '');
+  const [globalSeoDesc, setGlobalSeoDesc] = useState(settings.seo_description || '');
+  const [globalSeoKeywords, setGlobalSeoKeywords] = useState(settings.seo_keywords || '');
   const [isSavingSettings, setIsSavingSettings] = useState(false);
 
   useEffect(() => {
@@ -57,6 +64,9 @@ export function Admin() {
     setContactPhone(settings.contact_phone || '');
     setTwitterUrl(settings.twitter_url || '');
     setTelegramUrl(settings.telegram_url || '');
+    setGlobalSeoTitle(settings.seo_title || '');
+    setGlobalSeoDesc(settings.seo_description || '');
+    setGlobalSeoKeywords(settings.seo_keywords || '');
   }, [settings]);
 
   const toggleSelection = (id: string) => {
@@ -148,6 +158,9 @@ export function Admin() {
         type,
         url: mediaUrl,
         category: category.trim() || undefined,
+        seoTitle: mediaSeoTitle.trim() || undefined,
+        seoDescription: mediaSeoDesc.trim() || undefined,
+        seoKeywords: mediaSeoKeywords.trim() || undefined,
         ...(type === 'video' && thumbUrl ? { thumbnailUrl: thumbUrl } : {})
       });
       
@@ -157,6 +170,9 @@ export function Admin() {
       setMediaUrlInput('');
       setThumbnailUrlInput('');
       setCategory('');
+      setMediaSeoTitle('');
+      setMediaSeoDesc('');
+      setMediaSeoKeywords('');
       showAlert({ type: 'success', message: 'Media added successfully!' });
     } catch (error: any) {
       console.error(error);
@@ -193,7 +209,10 @@ export function Admin() {
         contact_email: contactEmail,
         contact_phone: contactPhone,
         twitter_url: twitterUrl,
-        telegram_url: telegramUrl
+        telegram_url: telegramUrl,
+        seo_title: globalSeoTitle,
+        seo_description: globalSeoDesc,
+        seo_keywords: globalSeoKeywords
       });
       
       setLogoFile(null);
@@ -289,6 +308,18 @@ CREATE TABLE IF NOT EXISTS settings (
   telegram_url TEXT
 );
 
+-- Update media table to include duration column
+ALTER TABLE media ADD COLUMN IF NOT EXISTS duration TEXT;
+
+-- SEO Additions
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS seo_title TEXT;
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS seo_description TEXT;
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS seo_keywords TEXT;
+ALTER TABLE media ADD COLUMN IF NOT EXISTS seo_title TEXT;
+ALTER TABLE media ADD COLUMN IF NOT EXISTS seo_description TEXT;
+ALTER TABLE media ADD COLUMN IF NOT EXISTS seo_keywords TEXT;
+
+
 -- Enable RLS and add policies for settings table
 ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read access on settings" ON settings FOR SELECT USING (true);
@@ -374,6 +405,46 @@ create policy "Auth Delete" on storage.objects for delete using ( bucket_id = 'm
                   placeholder="https://t.me/yourchannel"
                 />
               </div>
+              
+              <div className="md:col-span-2 pt-6 border-t border-zinc-800">
+                <h3 className="text-lg font-medium text-zinc-100 mb-4">Global Search Engine Optimization (SEO)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-300 mb-1.5">SEO Meta Title</label>
+                    <input
+                      type="text"
+                      value={globalSeoTitle}
+                      onChange={(e) => setGlobalSeoTitle(e.target.value)}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="BestNigthVideos&Pics - Best Quality Media"
+                    />
+                    <p className="mt-1 text-xs text-zinc-500">Defaults to Site Name if left empty.</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-300 mb-1.5">SEO Meta Keywords</label>
+                    <input
+                      type="text"
+                      value={globalSeoKeywords}
+                      onChange={(e) => setGlobalSeoKeywords(e.target.value)}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="media, videos, pictures, download"
+                    />
+                    <p className="mt-1 text-xs text-zinc-500">Comma-separated list of keywords.</p>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-zinc-300 mb-1.5">SEO Meta Description</label>
+                    <textarea
+                      value={globalSeoDesc}
+                      onChange={(e) => setGlobalSeoDesc(e.target.value)}
+                      rows={2}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                      placeholder="A lightweight media app for downloading, viewing images and videos."
+                    />
+                    <p className="mt-1 text-xs text-zinc-500">Defaults to Site Description if left empty.</p>
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-1.5">Site Logo</label>
                 <div className="space-y-3">
@@ -680,6 +751,40 @@ create policy "Auth Delete" on storage.objects for delete using ( bucket_id = 'm
                     </>
                   )}
 
+                  <div className="pt-4 border-t border-zinc-800/50 space-y-4">
+                    <h3 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider">SEO Details (Optional)</h3>
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-300 mb-1.5">SEO Meta Title</label>
+                      <input
+                        type="text"
+                        value={mediaSeoTitle}
+                        onChange={(e) => setMediaSeoTitle(e.target.value)}
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        placeholder="Optimized generic title for search engines"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-300 mb-1.5">SEO Meta Keywords</label>
+                      <input
+                        type="text"
+                        value={mediaSeoKeywords}
+                        onChange={(e) => setMediaSeoKeywords(e.target.value)}
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        placeholder="funny video, epic fails, highlight"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-300 mb-1.5">SEO Meta Description</label>
+                      <textarea
+                        value={mediaSeoDesc}
+                        onChange={(e) => setMediaSeoDesc(e.target.value)}
+                        rows={2}
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                        placeholder="Detailed description about the media..."
+                      />
+                    </div>
+                  </div>
+
                   <button
                     type="submit"
                     disabled={isUploading}
@@ -793,24 +898,36 @@ create policy "Auth Delete" on storage.objects for delete using ( bucket_id = 'm
                           </div>
                         </div>
                         
-                        <button
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            const confirmed = await showConfirm('Are you sure you want to delete this media?');
-                            if (confirmed) {
-                              try {
-                                await deleteMedia(item.id);
-                                showAlert({ type: 'success', message: 'Media deleted successfully.' });
-                              } catch (error) {
-                                showAlert({ type: 'error', message: 'Failed to delete media.' });
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingMedia(item);
+                            }}
+                            className="p-2 text-zinc-500 hover:text-indigo-400 hover:bg-indigo-400/10 rounded-lg transition-colors flex-shrink-0"
+                            title="Edit"
+                          >
+                            <Edit className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              const confirmed = await showConfirm('Are you sure you want to delete this media?');
+                              if (confirmed) {
+                                try {
+                                  await deleteMedia(item.id);
+                                  showAlert({ type: 'success', message: 'Media deleted successfully.' });
+                                } catch (error) {
+                                  showAlert({ type: 'error', message: 'Failed to delete media.' });
+                                }
                               }
-                            }
-                          }}
-                          className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors ml-4 flex-shrink-0"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+                            }}
+                            className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors flex-shrink-0"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -818,8 +935,152 @@ create policy "Auth Delete" on storage.objects for delete using ( bucket_id = 'm
               </div>
             </div>
           </div>
+
+          {editingMedia && (
+            <EditMediaModal 
+              item={editingMedia}
+              categories={settings.categories}
+              onClose={() => setEditingMedia(null)}
+              onSave={async (updates) => {
+                try {
+                  await updateMedia(editingMedia.id, updates);
+                  showAlert({ type: 'success', message: 'Media updated successfully!' });
+                  setEditingMedia(null);
+                } catch (error) {
+                  showAlert({ type: 'error', message: 'Failed to update media.' });
+                }
+              }}
+            />
+          )}
         </>
       )}
+    </div>
+  );
+}
+
+function EditMediaModal({ 
+  item, 
+  categories, 
+  onClose, 
+  onSave 
+}: { 
+  item: MediaItem; 
+  categories: string[]; 
+  onClose: () => void; 
+  onSave: (updates: Partial<MediaItem>) => Promise<void>;
+}) {
+  const [title, setTitle] = useState(item.title);
+  const [category, setCategory] = useState(item.category || '');
+  const [seoTitle, setSeoTitle] = useState(item.seoTitle || '');
+  const [seoDescription, setSeoDescription] = useState(item.seoDescription || '');
+  const [seoKeywords, setSeoKeywords] = useState(item.seoKeywords || '');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+    
+    setIsSaving(true);
+    await onSave({
+      title: title.trim(),
+      category: category.trim() || undefined,
+      seoTitle: seoTitle.trim() || undefined,
+      seoDescription: seoDescription.trim() || undefined,
+      seoKeywords: seoKeywords.trim() || undefined
+    });
+    setIsSaving(false);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-zinc-100">Edit Media Details</h2>
+          <button onClick={onClose} className="p-2 text-zinc-400 hover:text-white transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-1.5">Title</label>
+            <input
+              type="text"
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-zinc-300 mb-1.5">Category</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">No Category</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="pt-6 mt-6 border-t border-zinc-800/50 space-y-4">
+            <h3 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider">SEO Overrides</h3>
+            <div>
+              <label className="block text-sm font-medium text-zinc-300 mb-1.5">SEO Meta Title</label>
+              <input
+                type="text"
+                value={seoTitle}
+                onChange={(e) => setSeoTitle(e.target.value)}
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Optimized generic title for search engines"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-zinc-300 mb-1.5">SEO Meta Keywords</label>
+              <input
+                type="text"
+                value={seoKeywords}
+                onChange={(e) => setSeoKeywords(e.target.value)}
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="funny video, epic fails, highlight"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-zinc-300 mb-1.5">SEO Meta Description</label>
+              <textarea
+                value={seoDescription}
+                onChange={(e) => setSeoDescription(e.target.value)}
+                rows={3}
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                placeholder="Detailed description about the media..."
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-6 mt-6 border-t border-zinc-800/50">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-zinc-400 hover:text-zinc-100 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 text-white font-medium px-6 py-2 rounded-xl transition-colors"
+            >
+              {isSaving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
